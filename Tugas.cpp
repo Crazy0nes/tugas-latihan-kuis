@@ -52,6 +52,32 @@ void saveSongList() {
     }
 }
 
+void editSong() {
+    string pencarian;
+    cout << "Masukkan judul lagu yang ingin diedit: ";
+    cin.ignore();
+    getline(cin, pencarian);
+
+    int index = binary_search(pencarian);
+    if (index != -1) {
+        cout << "Masukkan detail baru untuk lagu ini:" << endl;
+        cout << "Masukan judul baru        : ";
+        getline(cin, song[index].judulLagu);
+        cout << "Masukan penyanyi baru    : ";
+        getline(cin, song[index].penyanyi);
+        cout << "Masukan genre baru        : ";
+        getline(cin, song[index].genre);
+        cout << "Masukan tahun baru        : ";
+        cin >> song[index].tahun;
+
+        quicksort(song, 0, index_terbesar - 1);
+        saveData();
+        cout << "Lagu berhasil diedit." << endl;
+    } else {
+        cout << "Lagu tidak ditemukan." << endl;
+    }
+}
+
 void saveSongDetails() {
     FILE *outFile = fopen("song_details.dat", "wb");
     if (outFile != NULL) {
@@ -221,7 +247,8 @@ int main() {
         cout << setfill(' ') << setw(3) << "1. " << "Tambah lagu" << endl;
         cout << setfill(' ') << setw(3) << "2. " << "Cari Lagu" << endl;
         cout << setfill(' ') << setw(3) << "3. " << "Tampilkan Daftar Lagu" << endl;
-        cout << setfill(' ') << setw(3) << "4. " << "Keluar" << endl << endl;
+        cout << setfill(' ') << setw(3) << "4. " << "Edit Lagu" << endl;
+        cout << setfill(' ') << setw(3) << "5. " << "Keluar" << endl << endl;
         cout << "Pilih Menu: ";
         int menu;
         cin >> menu;
@@ -246,6 +273,12 @@ int main() {
             break;
 
         case 4:
+        editSong();
+        system("pause");
+        system("cls");
+        break;
+
+        case 5:
          cout << endl << "Keluar dari Program" << endl;
          again = false;
             break;
