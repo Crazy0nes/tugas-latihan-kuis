@@ -1,6 +1,5 @@
 #include <iostream>
 #include <iomanip>
-#include <cstdio>
 using namespace std;
 
 int index_terbesar = 0;
@@ -38,16 +37,27 @@ void quicksort(Lagu array[], int low, int high) {
     }
 }
 
-void saveData() {
-    FILE *outFile = fopen("songs.dat", "wb");
+void saveSongList() {
+    FILE *outFile = fopen("song_list.dat", "wb");
     if (outFile != NULL) {
         fwrite(&index_terbesar, sizeof(index_terbesar), 1, outFile);
         for (int i = 0; i < index_terbesar; i++) {
             int judulLaguLength = song[i].judulLagu.length();
-            int penyanyiLength = song[i].penyanyi.length();
-            int genreLength = song[i].genre.length();
             fwrite(&judulLaguLength, sizeof(int), 1, outFile);
             fwrite(song[i].judulLagu.c_str(), sizeof(char), judulLaguLength, outFile);
+        }
+        fclose(outFile);
+    } else {
+        cout << "Error opening file for writing song list." << endl;
+    }
+}
+
+void saveSongDetails() {
+    FILE *outFile = fopen("song_details.dat", "wb");
+    if (outFile != NULL) {
+        for (int i = 0; i < index_terbesar; i++) {
+            int penyanyiLength = song[i].penyanyi.length();
+            int genreLength = song[i].genre.length();
             fwrite(&penyanyiLength, sizeof(int), 1, outFile);
             fwrite(song[i].penyanyi.c_str(), sizeof(char), penyanyiLength, outFile);
             fwrite(&genreLength, sizeof(int), 1, outFile);
@@ -56,21 +66,37 @@ void saveData() {
         }
         fclose(outFile);
     } else {
-        cout << "Error opening file for writing." << endl;
+        cout << "Error opening file for writing song details." << endl;
     }
 }
 
+void saveData() {
+    saveSongList();
+    saveSongDetails();
+}
+
 void loadData() {
-    FILE *inFile = fopen("songs.dat", "rb");
+    FILE *inFile = fopen("song_list.dat", "rb");
     if (inFile != NULL) {
         fread(&index_terbesar, sizeof(index_terbesar), 1, inFile);
         for (int i = 0; i < index_terbesar; i++) {
-            int judulLaguLength, penyanyiLength, genreLength;
+            int judulLaguLength;
             char buffer[100];
             fread(&judulLaguLength, sizeof(int), 1, inFile);
             fread(buffer, sizeof(char), judulLaguLength, inFile);
             buffer[judulLaguLength] = '\0';
             song[i].judulLagu = buffer;
+        }
+        fclose(inFile);
+    } else {
+        cout << "Error opening file for reading song list." << endl;
+    }
+
+    inFile = fopen("song_details.dat", "rb");
+    if (inFile != NULL) {
+        for (int i = 0; i < index_terbesar; i++) {
+            int penyanyiLength, genreLength;
+            char buffer[100];
             fread(&penyanyiLength, sizeof(int), 1, inFile);
             fread(buffer, sizeof(char), penyanyiLength, inFile);
             buffer[penyanyiLength] = '\0';
@@ -83,7 +109,7 @@ void loadData() {
         }
         fclose(inFile);
     } else {
-        cout << "Error opening file for reading." << endl;
+        cout << "Error opening file for reading song details." << endl;
     }
 }
 
@@ -172,6 +198,14 @@ void cari() {
     }
 }
 
+void tampilkan(){
+    cout << "Daftar Lagu" << endl;
+    cout << setfill('=') << setw(15) << "=" << endl;
+    for (int i = 0; i < index_terbesar; i++) {
+        cout << i + 1 << ". " << song[i].judulLagu << " - " << song[i].penyanyi << "(" << song[i].tahun << ")" << endl;
+    }
+}
+
 int main() {
     loadData();
     bool again = true;
@@ -181,14 +215,13 @@ int main() {
         cout << "Playlist Lagu" << endl;
         cout << setfill('=') << setw(15) << "=" << endl;
 
-        for (int i = 0; i < index_terbesar; i++) {
-            cout << i + 1 << ". " << song[i].judulLagu << " - " << song[i].penyanyi << "(" << song[i].tahun << ")" << endl;
-        }
+        
 
         cout << setfill('=') << setw(15) << "=" << endl;
         cout << setfill(' ') << setw(3) << "1. " << "Tambah lagu" << endl;
         cout << setfill(' ') << setw(3) << "2. " << "Cari Lagu" << endl;
-        cout << setfill(' ') << setw(3) << "3. " << "Keluar" << endl << endl;
+        cout << setfill(' ') << setw(3) << "3. " << "Tampilkan Daftar Lagu" << endl;
+        cout << setfill(' ') << setw(3) << "4. " << "Keluar" << endl << endl;
         cout << "Pilih Menu: ";
         int menu;
         cin >> menu;
@@ -196,15 +229,25 @@ int main() {
         switch (menu) {
         case 1:
             tambah();
+            system("pause");
+            system("cls");
             break;
 
         case 2:
             cari();
+            system("pause");
+            system("cls");
             break;
 
         case 3:
-            cout << endl << "Keluar dari Program" << endl;
-            again = false;
+        tampilkan();
+        system("pause");
+        system("cls");
+            break;
+
+        case 4:
+         cout << endl << "Keluar dari Program" << endl;
+         again = false;
             break;
 
         default:
